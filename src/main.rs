@@ -56,7 +56,11 @@ async fn ecd_get_token(Json(req): Json<EcdRequest>) -> Result<Json<EcdResponse>,
 async fn main() {
     let app = Router::new().route("/ecd_get_token", post(ecd_get_token));
 
-    let addr = SocketAddr::from(([0, 0, 0, 0], 3000));
+    let port = std::env::var("PORT")
+        .unwrap_or_else(|_| "3000".to_string())
+        .parse::<u16>()
+        .unwrap();
+    let addr = SocketAddr::from(([0, 0, 0, 0], port));
     println!("listening on {}", &addr);
     axum::Server::bind(&addr)
         .serve(app.into_make_service())
