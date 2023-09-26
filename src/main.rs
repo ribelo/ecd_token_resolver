@@ -4,7 +4,7 @@ use anyhow::Error;
 use axum::{
     http::StatusCode,
     response::{IntoResponse, Response},
-    routing::post,
+    routing::{get, post},
     Json, Router,
 };
 use ecd_token_resolver::Ecd;
@@ -52,9 +52,15 @@ async fn ecd_get_token(Json(req): Json<EcdRequest>) -> Result<Json<EcdResponse>,
     Ok(Json(EcdResponse { token }))
 }
 
+async fn hello_world() -> Result<String, AppError> {
+    Ok("Hello world!".to_string())
+}
+
 #[tokio::main]
 async fn main() {
-    let app = Router::new().route("/ecd_get_token", post(ecd_get_token));
+    let app = Router::new()
+        .route("/", get(hello_world))
+        .route("/ecd_get_token", post(ecd_get_token));
 
     let port = std::env::var("PORT")
         .unwrap_or_else(|_| "3000".to_string())
